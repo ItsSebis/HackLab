@@ -1,5 +1,5 @@
 @(echo off% <#%) &title Toggle Defender, AveYo 2020-11-16          || configure just auto-actions OFF; toggle icon on ltsb
-set "0=%~f0"&set 1=%*&powershell -nop -win 1 -c iex ([io.file]::ReadAllText($env:0)) &exit/b ||#>)[1]
+set "0=%~f0"&set 1=%*&powershell -nop -win 1 -c iex ([io.file]::ReadAllText($env:0))  ||#>)[1]
 sp 'HKCU:\Volatile Environment' 'ToggleDefender' @'
 if ($(sc.exe qc windefend) -like '*TOGGLE*') {$TOGGLE=7;$KEEP=6;$A='Enable';$S='OFF'}else{$TOGGLE=6;$KEEP=7;$A='Disable';$S='ON'}
 
@@ -66,19 +66,19 @@ $wdp='HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender'
 ' Security Center\Notifications','\UX Configuration','\MpEngine','\Spynet','\Real-Time Protection' |% {ni ($wdp+$_)-ea 0|out-null}
 
 ## Toggle Defender
-if ($env:1 -eq 7) {
-  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications' DisableNotifications -Force -ea 0
-  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\UX Configuration' Notification_Suppress -Force -ea 0
-  rp 'HKLM:\SOFTWARE\Microsoft\Windows Defender Security Center\Notifications' DisableNotifications -Force -ea 0
-  rp 'HKLM:\SOFTWARE\Microsoft\Windows Defender\UX Configuration' Notification_Suppress -Force -ea 0
-  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System' EnableSmartScreen -Force -ea 0
-  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' DisableAntiSpyware -Force -ea 0
-  rp 'HKLM:\SOFTWARE\Microsoft\Windows Defender' DisableAntiSpyware -Force -ea 0
-  sc.exe config windefend depend= RpcSs
-  net1 start windefend
-  kill -Force -Name MpCmdRun -ea 0
-  start ($env:ProgramFiles+'\Windows Defender\MpCmdRun.exe') -Arg '-EnableService' -win 1
-} else {
+#if ($env:1 -eq 7) {
+#  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications' DisableNotifications -Force -ea 0
+#  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\UX Configuration' Notification_Suppress -Force -ea 0
+#  rp 'HKLM:\SOFTWARE\Microsoft\Windows Defender Security Center\Notifications' DisableNotifications -Force -ea 0
+#  rp 'HKLM:\SOFTWARE\Microsoft\Windows Defender\UX Configuration' Notification_Suppress -Force -ea 0
+#  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\System' EnableSmartScreen -Force -ea 0
+#  rp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' DisableAntiSpyware -Force -ea 0
+#  rp 'HKLM:\SOFTWARE\Microsoft\Windows Defender' DisableAntiSpyware -Force -ea 0
+#  sc.exe config windefend depend= RpcSs
+#  net1 start windefend
+#  kill -Force -Name MpCmdRun -ea 0
+#  start ($env:ProgramFiles+'\Windows Defender\MpCmdRun.exe') -Arg '-EnableService' -win 1
+#} else {
   sp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\Notifications' DisableNotifications 1 -Type Dword -ea 0
   sp 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\UX Configuration' Notification_Suppress 1 -Type Dword -Force -ea 0
   sp 'HKLM:\SOFTWARE\Microsoft\Windows Defender Security Center\Notifications' DisableNotifications 1 -Type Dword -ea 0
@@ -92,21 +92,21 @@ if ($env:1 -eq 7) {
   start ($env:ProgramFiles+'\Windows Defender\MpCmdRun.exe') -Arg '-DisableService' -win 1
   del ($env:ProgramData+'\Microsoft\Windows Defender\Scans\mpenginedb.db') -Force -ea 0           ## Commented = keep scan history
   del ($env:ProgramData+'\Microsoft\Windows Defender\Scans\History\Service') -Recurse -Force -ea 0
-}
+#}
 
 ## PERSONAL CONFIGURATION TWEAK - COMMENT OR UNCOMMENT #rp ENTRIES TO TWEAK OR REVERT
 sp $wdp DisableRoutinelyTakingAction 1 -Type Dword -Force -ea 0                       ## Auto Actions OFF
 # rp $wdp DisableRoutinelyTakingAction -Force -ea 0                                   ## Auto Actions ON [default]
 sp $wdp PUAProtection 1 -Type Dword -Force -ea 0                                      ## Potential Unwanted Apps ON
 rp $wdp PUAProtection -Force -ea 0                                                    ## Potential Unwanted Apps OFF [default]
-sp ($wdp+'\MpEngine') MpCloudBlockLevel 2 -Type Dword -Force -ea 0                    ## Cloud blocking level HIGH
+#sp ($wdp+'\MpEngine') MpCloudBlockLevel 2 -Type Dword -Force -ea 0                    ## Cloud blocking level HIGH
 rp ($wdp+'\MpEngine') MpCloudBlockLevel -Force -ea 0                                  ## Cloud blocking level LOW [default]
-sp ($wdp+'\Spynet') SpyNetReporting 2 -Type Dword -Force -ea 0                        ## Cloud protection ADVANCED
+#sp ($wdp+'\Spynet') SpyNetReporting 2 -Type Dword -Force -ea 0                        ## Cloud protection ADVANCED
 rp ($wdp+'\Spynet') SpyNetReporting -Force -ea 0                                      ## Cloud protection BASIC [default]
 sp ($wdp+'\Spynet') SubmitSamplesConsent 0 -Type Dword -Force -ea 0                   ## Sample Submission ALWAYS-PROMPT
 rp ($wdp+'\Spynet') SubmitSamplesConsent -Force -ea 0                                 ## Sample Submission AUTOMATIC [default]
-sp ($wdp+'\Real-Time Protection') RealtimeScanDirection 1 -Type Dword -Force -ea 0    ## Scan incoming file only
-rp ($wdp+'\Real-Time Protection') RealtimeScanDirection -Force -ea 0                  ## Scan incoming and outgoing file [default]
+#sp ($wdp+'\Real-Time Protection') RealtimeScanDirection 1 -Type Dword -Force -ea 0    ## Scan incoming file only
+#rp ($wdp+'\Real-Time Protection') RealtimeScanDirection -Force -ea 0                  ## Scan incoming and outgoing file [default]
 
 ## Uncomment to close windows built-in lame uac bpass and/or reset uac
 # if ($flaw.Actions.Item(1).Path -ilike '*windir*') {
@@ -117,5 +117,6 @@ rp ($wdp+'\Real-Time Protection') RealtimeScanDirection -Force -ea 0            
 #   sp $uac ConsentPromptBehaviorAdmin 2 -Type Dword -Force -ea 0                     ## UAC always notify - bpassable otherwise
 #   sp $uac PromptOnSecureDesktop 1 -Type Dword -Force -ea 0                          ## UAC secure - prevent automation
 # }
-#'@ -Force -ea 0; iex((gp Registry::HKEY_Users\S-1-5-21*\Volatile* ToggleDefender -ea 0)[0].ToggleDefender)
+
+'@ -Force -ea 0; iex((gp Registry::HKEY_Users\S-1-5-21*\Volatile* ToggleDefender -ea 0)[0].ToggleDefender)
 #-_-# hybrid script, can be pasted directly into powershell console
